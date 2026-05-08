@@ -1,13 +1,14 @@
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement; // Para controlar as cenas
-using UnityEngine.InputSystem; // Para controlar o PlayerInput
+using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem; 
 
-// 1. O ENUM (Lista de estados)
+
 public enum GameState { Iniciando, MenuPrincipal, Gameplay }
 
 public class GameManager : MonoBehaviour
 {
-    // 2. O SINGLETON (Acesso global)
+   
     public static GameManager Instance { get; private set; }
 
     [Header("Configurações de Estado")]
@@ -15,7 +16,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        // Regra do Singleton: se já existir um "eu", me destruo. Se não, eu sou o único.
+        
         if (Instance == null)
         {
             Instance = this;
@@ -31,14 +32,16 @@ public class GameManager : MonoBehaviour
     {
         // Começa o jogo no estado Iniciando
         UpdateState(GameState.Iniciando);
+   
+        ChangeScene("Splash", GameState.Iniciando);
     }
-
-    // 3. MÁQUINA DE ESTADOS SIMPLIFICADA
+    
+    
     public void UpdateState(GameState newState)
     {
         currentState = newState;
         
-        // Exibe no Console conforme pedido no trabalho
+       
         Debug.Log($"<color=yellow>GameManager:</color> Estado alterado para <b>{currentState}</b>");
     }
 

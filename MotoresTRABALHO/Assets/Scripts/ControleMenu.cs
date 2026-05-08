@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ConroleMenu : MonoBehaviour
+public class ControleMenu : MonoBehaviour
 {
     public void ClicouIniciar()
     {
