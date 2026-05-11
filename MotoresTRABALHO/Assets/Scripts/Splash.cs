@@ -12,7 +12,7 @@ public class Splash : MonoBehaviour
         {
             yield return new WaitForSeconds(2f);
 
-            GameManager.Instance.ChangeScene("MenuPrincipal", GameState.MenuPrincipal);
+            GameManager.Instance.ChangeScene("MenuPrincipal");
         }
     }
 //

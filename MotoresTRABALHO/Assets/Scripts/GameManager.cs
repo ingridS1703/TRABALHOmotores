@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
         // Começa o jogo no estado Iniciando
         UpdateState(GameState.Iniciando);
    
-        ChangeScene("Splash", GameState.Iniciando);
+        ChangeScene("Splash");
     }
     
     
@@ -45,21 +45,35 @@ public class GameManager : MonoBehaviour
         Debug.Log($"<color=yellow>GameManager:</color> Estado alterado para <b>{currentState}</b>");
     }
 
-    // 4. CENTRALIZADOR DE CENAS (O único que usa SceneManager)
-    public void ChangeScene(string sceneName, GameState nextState)
+    
+    public void ChangeScene(string sceneName)
     {
-        // Aqui o GameManager decide se autoriza a mudança
+        // GameManager decide se autoriza a mudança
         SceneManager.LoadScene(sceneName);
-        UpdateState(nextState);
-    }
+        if (sceneName == "MenuPrincipal")
+        {
+            UpdateState(GameState.MenuPrincipal);
+        }
+        else if (sceneName == "GetStarted_Scene")
+        {
+            
+            UpdateState(GameState.Gameplay);
+        }
+        else if (sceneName == "Splash")
+        {
+            UpdateState(GameState.Iniciando);
 
-    // 5. ALOCAÇÃO DE INPUT (Para o PlayerInput do Input System)
+        }
+
+    }
+    
+    
     public void AssignPlayerInput(PlayerInput playerInput)
     {
         if (playerInput != null)
         {
             Debug.Log("GameManager: Alocando inputs ao jogador.");
-            // Aqui você poderia ativar/desativar mapas de ação se necessário
+           
         }
     }
 
