@@ -1,3 +1,4 @@
+using UnityEngine.SceneManagement;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,6 +35,8 @@ public class GameManager : MonoBehaviour
         UpdateState(GameState.Iniciando);
    
         ChangeScene("Splash");
+
+   
     }
     
     
@@ -58,6 +61,8 @@ public class GameManager : MonoBehaviour
         {
             
             UpdateState(GameState.Gameplay);
+            
+            SceneManager.LoadScene("GUI", UnityEngine.SceneManagement.LoadSceneMode.Additive);
         }
         else if (sceneName == "Splash")
         {
