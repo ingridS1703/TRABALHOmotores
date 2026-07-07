@@ -14,7 +14,7 @@ public class UI_MoedasCont : MonoBehaviour
     private void OnDisable()
     {
 
-        PlayerObserverMnager.OnCoinCollected += AtualizarTexto;
+        PlayerObserverMnager.OnCoinCollected -= AtualizarTexto;
     }
 
     private void AtualizarTexto(int quantidadeDeMoedas)
