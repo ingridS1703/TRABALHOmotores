@@ -1,65 +1,62 @@
-
 using UnityEngine;
-using UnityEngine.InputSystem; // Certifique-se de que esta linha está no topo!
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    
     private int moedasColetadas = 0;
-    [SerializeField] private float forcaPulo = 8f; 
+    [SerializeField] private float forcaPulo = 8f;
+    [SerializeField] private float velocidadeMove = 5f;
+
     private Rigidbody rb;
-    
-    // Guardamos o componente aqui para usar no Update
-    private PlayerInput inputDoJogador; 
-    private InputAction jumpAction;
+    private PlayerInput inputDoJogador;
+    private Vector2 direcaoMove;
 
     void Start()
     {
+
+        
         rb = GetComponent<Rigidbody>();
         inputDoJogador = GetComponent<PlayerInput>();
 
-        // Procura a ação chamada "Jump" dentro do Input System do robô
-        if (inputDoJogador != null)
-        {
-            jumpAction = inputDoJogador.actions.FindAction("Jump");
-        }
-
-        if (GameManager.Instance != null)
+        if (GameManager.Instance != null && inputDoJogador != null)
         {
             GameManager.Instance.AssignPlayerInput(inputDoJogador);
         }
     }
 
-    void Update()
+    // Chamado automaticamente quando o robô move no WASD ou Setas
+    public void OnMove(InputValue value)
     {
-        // Força a leitura direta da tecla de espaço do Novo Input System
-        if (InputSystem.GetDevice<Keyboard>() != null && InputSystem.GetDevice<Keyboard>().spaceKey.wasPressedThisFrame)
+        direcaoMove = value.Get<Vector2>();
+    }
+
+    // Chamado automaticamente quando a ação "Jump" é pressionada
+    public void OnJump()
+    {
+        if (rb != null)
         {
-            if (rb != null)
-            {
-                // Em vez de somar força, nós definimos a velocidade vertical diretamente para 15 (um valor bem forte para testar!)
-                rb.linearVelocity = new Vector3(rb.linearVelocity.x, 15f, rb.linearVelocity.z);
-                
-                // Se a sua Unity usar a versão mais recente e der erro na linha de cima, use esta:
-                // rb.linearVelocity = new Vector3(rb.linearVelocity.x, 15f, rb.linearVelocity.z);
-                
-                Debug.LogWarning("PULO EXECUTADO VIA CÓDIGO!");
-            }
+            // Aplica o pulo no robô correspondente
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, forcaPulo, rb.linearVelocity.z);
         }
     }
 
-
+    void Update()
+    {
+        // Aplica a movimentação no Robô (X e Z no espaço 3D)
+        if (rb != null)
+        {
+            Vector3 movimento = new Vector3(direcaoMove.x * velocidadeMove, rb.linearVelocity.y, direcaoMove.y * velocidadeMove);
+            rb.linearVelocity = movimento;
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Moeda"))
         {
             moedasColetadas++;
-            
             PlayerObserverMnager.SetCoinCollected(moedasColetadas);
-            
             Destroy(other.gameObject);
         }
     }
-    
 }
