@@ -3,60 +3,114 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    private int moedasColetadas = 0;
-    [SerializeField] private float forcaPulo = 8f;
-    [SerializeField] private float velocidadeMove = 5f;
+    [Header("Configurações de Movimento")]
+    public float velocidade = 5f;
+    public float velocidadeRotacao = 720f;
 
-    private Rigidbody rb;
-    private PlayerInput inputDoJogador;
-    private Vector2 direcaoMove;
+    
+    [Header("Esquema de Controlo")]
+    
+    public string defaultControlScheme = "WASD";
 
-    void Start()
+    
+    [Header("Câmera do Jogador")]
+    public Camera cameraDoJogador;
+    public Vector3 offsetCamera = new Vector3(0f, 3f, -5f);
+    public float velocidadeCamera = 5f;
+
+    private PlayerInput playerInput;
+    private Vector2 inputMovimento;
+    private CharacterController controller;
+    private Animator animator;
+
+    void Awake()
     {
+        playerInput = GetComponent<PlayerInput>();
+        controller = GetComponent<CharacterController>();
+        animator = GetComponentInChildren<Animator>(); // Encontra o Animator no corpo/filhos do robô
+    }
 
+    void OnEnable()
+    {
         
-        rb = GetComponent<Rigidbody>();
-        inputDoJogador = GetComponent<PlayerInput>();
-
-        if (GameManager.Instance != null && inputDoJogador != null)
+        if (playerInput != null)
         {
-            GameManager.Instance.AssignPlayerInput(inputDoJogador);
+            playerInput.ActivateInput();
+            ForcarEsquemaDeControlo();
         }
     }
 
-    // Chamado automaticamente quando o robô move no WASD ou Setas
+    void OnDisable()
+    {
+        
+        if (playerInput != null)
+        {
+            playerInput.DeactivateInput();
+        }
+    }
+
+    
     public void OnMove(InputValue value)
     {
-        direcaoMove = value.Get<Vector2>();
-    }
-
-    // Chamado automaticamente quando a ação "Jump" é pressionada
-    public void OnJump()
-    {
-        if (rb != null)
-        {
-            // Aplica o pulo no robô correspondente
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, forcaPulo, rb.linearVelocity.z);
-        }
+        inputMovimento = value.Get<Vector2>();
     }
 
     void Update()
     {
-        // Aplica a movimentação no Robô (X e Z no espaço 3D)
-        if (rb != null)
-        {
-            Vector3 movimento = new Vector3(direcaoMove.x * velocidadeMove, rb.linearVelocity.y, direcaoMove.y * velocidadeMove);
-            rb.linearVelocity = movimento;
-        }
+        MoverJogador();
     }
 
-    private void OnTriggerEnter(Collider other)
+    void LateUpdate()
     {
-        if (other.CompareTag("Moeda"))
+        AtualizarPosicaoCamera();
+    }
+
+    private void MoverJogador()
+    {
+        // Atualiza a animação (saber se está a andar ou parado)
+        bool estaAndando = inputMovimento.sqrMagnitude > 0.01f;
+        if (animator != null)
         {
-            moedasColetadas++;
-            PlayerObserverMnager.SetCoinCollected(moedasColetadas);
-            Destroy(other.gameObject);
+            animator.SetBool("IsWalking", estaAndando);
+            animator.SetFloat("Speed", inputMovimento.magnitude);
+        }
+
+        if (!estaAndando) return;
+
+        Vector3 direcao = new Vector3(inputMovimento.x, 0f, inputMovimento.y);
+
+        
+        if (controller != null)
+        {
+            controller.Move(direcao * velocidade * Time.deltaTime);
+        }
+        else
+        {
+            transform.Translate(direcao * velocidade * Time.deltaTime, Space.World);
+        }
+
+        
+        Quaternion rotacaoAlvo = Quaternion.LookRotation(direcao, Vector3.up);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotacaoAlvo, velocidadeRotacao * Time.deltaTime);
+    }
+
+    private void AtualizarPosicaoCamera()
+    {
+        if (cameraDoJogador == null) return;
+
+        // Calcula a posição da câmera em relação ao robô e move suavemente
+        Vector3 posicaoDesejada = transform.position + offsetCamera;
+        cameraDoJogador.transform.position = Vector3.Lerp(cameraDoJogador.transform.position, posicaoDesejada, velocidadeCamera * Time.deltaTime);
+        cameraDoJogador.transform.LookAt(transform.position + Vector3.up * 1.5f);
+    }
+
+    public void ForcarEsquemaDeControlo()
+    {
+        if (playerInput != null && !string.IsNullOrEmpty(defaultControlScheme))
+        {
+            
+            playerInput.SwitchCurrentControlScheme(defaultControlScheme, Keyboard.current);
         }
     }
 }
+
