@@ -1,116 +1,65 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
     [Header("Configurações de Movimento")]
     public float velocidade = 5f;
-    public float velocidadeRotacao = 720f;
+    public float velocidadeRotacao = 150f;
 
-    
-    [Header("Esquema de Controlo")]
-    
-    public string defaultControlScheme = "WASD";
+    [Header("Teclas de Controle")]
+    public KeyCode frente = KeyCode.W;
+    public KeyCode tras = KeyCode.S;
+    public KeyCode esquerda = KeyCode.A;
+    public KeyCode direita = KeyCode.D;
 
-    
-    [Header("Câmera do Jogador")]
-    public Camera cameraDoJogador;
-    public Vector3 offsetCamera = new Vector3(0f, 3f, -5f);
-    public float velocidadeCamera = 5f;
-
-    private PlayerInput playerInput;
-    private Vector2 inputMovimento;
     private CharacterController controller;
     private Animator animator;
 
-    void Awake()
+    void Start()
     {
-        playerInput = GetComponent<PlayerInput>();
         controller = GetComponent<CharacterController>();
-        animator = GetComponentInChildren<Animator>(); // Encontra o Animator no corpo/filhos do robô
-    }
-
-    void OnEnable()
-    {
-        
-        if (playerInput != null)
-        {
-            playerInput.ActivateInput();
-            ForcarEsquemaDeControlo();
-        }
-    }
-
-    void OnDisable()
-    {
-        
-        if (playerInput != null)
-        {
-            playerInput.DeactivateInput();
-        }
-    }
-
-    
-    public void OnMove(InputValue value)
-    {
-        inputMovimento = value.Get<Vector2>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        MoverJogador();
-    }
+        // 1. Leitura das Teclas de Movimento
+        float moverFrenteTras = 0f;
+        float girar = 0f;
 
-    void LateUpdate()
-    {
-        AtualizarPosicaoCamera();
-    }
+        if (Input.GetKey(frente)) moverFrenteTras = 1f;
+        if (Input.GetKey(tras)) moverFrenteTras = -1f;
+        if (Input.GetKey(esquerda)) girar = -1f;
+        if (Input.GetKey(direita)) girar = 1f;
 
-    private void MoverJogador()
-    {
-        // Atualiza a animação (saber se está a andar ou parado)
-        bool estaAndando = inputMovimento.sqrMagnitude > 0.01f;
-        if (animator != null)
-        {
-            animator.SetBool("IsWalking", estaAndando);
-            animator.SetFloat("Speed", inputMovimento.magnitude);
-        }
+        // 2. Rotação do Robô
+        transform.Rotate(0, girar * velocidadeRotacao * Time.deltaTime, 0);
 
-        if (!estaAndando) return;
-
-        Vector3 direcao = new Vector3(inputMovimento.x, 0f, inputMovimento.y);
-
+        // 3. Movimento para Frente/Trás
+        Vector3 movimento = transform.forward * moverFrenteTras * velocidade;
         
         if (controller != null)
         {
-            controller.Move(direcao * velocidade * Time.deltaTime);
+            controller.SimpleMove(movimento);
         }
         else
         {
-            transform.Translate(direcao * velocidade * Time.deltaTime, Space.World);
+            transform.Translate(movimento * Time.deltaTime, Space.World);
         }
 
-        
-        Quaternion rotacaoAlvo = Quaternion.LookRotation(direcao, Vector3.up);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotacaoAlvo, velocidadeRotacao * Time.deltaTime);
-    }
-
-    private void AtualizarPosicaoCamera()
-    {
-        if (cameraDoJogador == null) return;
-
-        // Calcula a posição da câmera em relação ao robô e move suavemente
-        Vector3 posicaoDesejada = transform.position + offsetCamera;
-        cameraDoJogador.transform.position = Vector3.Lerp(cameraDoJogador.transform.position, posicaoDesejada, velocidadeCamera * Time.deltaTime);
-        cameraDoJogador.transform.LookAt(transform.position + Vector3.up * 1.5f);
-    }
-
-    public void ForcarEsquemaDeControlo()
-    {
-        if (playerInput != null && !string.IsNullOrEmpty(defaultControlScheme))
+        // 4. Controle Seguro de Animação (Sem gerar erro na consola)
+        if (animator != null)
         {
+            bool estaAndando = (moverFrenteTras != 0f || girar != 0f);
             
-            playerInput.SwitchCurrentControlScheme(defaultControlScheme, Keyboard.current);
+            // Verifica se o parâmetro 'IsWalking' realmente existe antes de usar
+            foreach (AnimatorControllerParameter param in animator.parameters)
+            {
+                if (param.name == "IsWalking")
+                {
+                    animator.SetBool("IsWalking", estaAndando);
+                }
+            }
         }
     }
 }
-

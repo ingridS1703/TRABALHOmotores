@@ -1383,7 +1383,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5513616485907650367}
-  - component: {fileID: 6469276857556395735}
   m_Layer: 0
   m_Name: InicializarJogador
   m_TagString: Untagged
@@ -1406,19 +1405,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7736108665850884707}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6469276857556395735
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3987895347866671612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ad2b9032c83d7c40b13e189cb13a1b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InicializarJogador
-  cameraDoJogador: {fileID: 5744773588333972899}
 --- !u!1 &4164629545193377320
 GameObject:
   m_ObjectHideFlags: 0
@@ -1884,7 +1870,6 @@ GameObject:
   - component: {fileID: 3849205041736059348}
   - component: {fileID: 7888870423227802977}
   - component: {fileID: 1113369256212864554}
-  - component: {fileID: 2817072586200002642}
   m_Layer: 8
   m_Name: Robot
   m_TagString: Player
@@ -2165,20 +2150,6 @@ MonoBehaviour:
   yThreshold: -5
   vCam: {fileID: 6712355593683709296}
   respawnSound: {fileID: 8300000, guid: 55462452cb80442b6acf85f10b161e13, type: 3}
---- !u!114 &2817072586200002642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5633379113638269974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 341a29e75a26e7140918a6bccab1921b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Player
-  forcaPulo: 8
-  velocidadeMove: 1000000
 --- !u!1 &5744773588333972899
 GameObject:
   m_ObjectHideFlags: 0
@@ -2271,7 +2242,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5744773588333972899}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72ece51f2901e7445ab60da3685d6b5f, type: 3}
   m_Name: 
