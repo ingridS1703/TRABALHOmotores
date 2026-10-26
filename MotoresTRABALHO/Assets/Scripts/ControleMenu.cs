@@ -5,7 +5,7 @@ public class ControleMenu : MonoBehaviour
     public void ClicouIniciar()
     {
 
-        GameManager.Instance.ChangeScene("GetStarted_Scene");
+        GameManager.Instance.LoadScene("GetStarted_Scene");
     }
 
     public void ClicouSair()

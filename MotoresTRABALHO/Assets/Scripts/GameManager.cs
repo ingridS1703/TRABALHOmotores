@@ -4,18 +4,17 @@ using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
-
-    public GameState currentState;
-
-    public PlayerInput playerInput;
-
     public enum GameState
     {
         Iniciando,
         MenuPrincipal,
         Gameplay
     }
+
+    public static GameManager Instance;
+
+    public GameState currentState;
+    public PlayerInput playerInput;
 
     private void Awake()
     {
@@ -33,12 +32,12 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         ChangeState(GameState.Iniciando);
-        SceneManager.LoadScene("Splash");
+        LoadScene("Splash");
     }
 
-    public void ChangeState(GameState newState)
+    public void ChangeState(GameState nextState)
     {
-        currentState = newState;
+        currentState = nextState;
         Debug.Log("Estado atual: " + currentState);
     }
 
@@ -57,12 +56,7 @@ public class GameManager : MonoBehaviour
 
             case "GetStarted_Scene":
                 SceneManager.LoadScene(sceneName);
-
-                SceneManager.LoadScene(
-                    "GUI",
-                    LoadSceneMode.Additive
-                );
-                
+                // SceneManager.LoadScene(sceneName, LoadSceneMode.Additive); // Comentado caso use Single
                 ChangeState(GameState.Gameplay);
                 break;
 
@@ -77,9 +71,16 @@ public class GameManager : MonoBehaviour
         LoadScene("MenuPrincipal");
     }
 
-    public void AssignPlayerInput(PlayerInput input)
+    public void AtivarPlayerInput(PlayerInput playerInput)
     {
-        playerInput = input;
-        Debug.Log("PlayerInput alocado.");
+        this.playerInput = playerInput;
+        Debug.Log("PlayerInput ativado.");
+    }
+
+    // Adicionado para resolver o erro do QuitGame no menu
+    public void QuitGame()
+    {
+        Debug.Log("A sair do jogo...");
+        Application.Quit();
     }
 }
